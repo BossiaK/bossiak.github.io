@@ -9,7 +9,7 @@
 #content
 {
 	float: none;
-	background-color: #222222;
+	background-color: transparent;
 	width: auto;
 	min-height: 700px;
 	padding: auto;		
@@ -55,6 +55,7 @@ h1{
 
 body{
 	background: #222222;
+	background-image: url("bck.png");
 }
 
 a {
