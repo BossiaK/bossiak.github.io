@@ -1,3 +1,3 @@
-Strona związana z muzyką
+Strona związana z muzyką, teledyskami, filmami
 
-Music related website
+
