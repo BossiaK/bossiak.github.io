@@ -2,41 +2,27 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HITS FM Szpieg</title>
+    <title>HITS FM - Odsłuchane</title>
     <style>
-        body { background: #0f172a; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
-        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .track { font-size: 22px; font-weight: bold; color: #38bdf8; text-align: center; margin: 20px 0; min-height: 30px; }
-        .player-controls { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 20px; border-bottom: 1px solid #334155; }
-        .play-btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .vol-box { display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        td, th { padding: 12px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
-        .time { color: #38bdf8; width: 140px; font-family: monospace; }
-        .error { color: #f87171; font-size: 12px; text-align: center; margin-top: 10px; }
+        body { background: #0f172a; color: #fff; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; }
+        .track { font-size: 20px; color: #38bdf8; text-align: center; margin: 15px 0; font-weight: bold; }
+        .play-btn { width: 100%; padding: 15px; border-radius: 8px; border: none; background: #38bdf8; cursor: pointer; font-weight: bold; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 14px; }
+        td { padding: 8px; border-bottom: 1px solid #334155; }
+        .time { color: #38bdf8; width: 80px; }
+        .error { color: #f87171; text-align: center; font-size: 12px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="player-controls">
-        <div style="font-size: 12px; color: #94a3b8;">RADIO NA ŻYWO</div>
-        <div class="track" id="currentTrack">Ładowanie...</div>
-        
-        <button class="play-btn" onclick="toggleAudio()" id="pBtn">URUCHOM RADIO</button>
-        
-        <div class="vol-box">
-            Głośność: 
-            <input type="range" min="0" max="1" step="0.01" value="0.8" oninput="setVol(this.value)">
-            <span id="volVal">80%</span>
-        </div>
-    </div>
-
+    <div style="text-align:center; font-size: 12px; color: #94a3b8;">TERAZ GRAMY:</div>
+    <div class="track" id="currentTrack">Ładowanie...</div>
+    
+    <button class="play-btn" onclick="toggleAudio()" id="pBtn">URUCHOM RADIO</button>
+    
     <table>
-        <thead>
-            <tr><th>Kiedy</th><th>Utwór</th></tr>
-        </thead>
         <tbody id="historyList"></tbody>
     </table>
     <div id="status" class="error"></div>
@@ -46,21 +32,13 @@
 
 <script>
     const audio = document.getElementById('audio');
-    const trackEl = document.getElementById('currentTrack');
-    const listEl = document.getElementById('historyList');
-    const statusEl = document.getElementById('status');
-
+    
     function toggleAudio() {
         const btn = document.getElementById('pBtn');
         if (audio.paused) {
-            audio.load();
-            audio.play().then(() => {
-                btn.textContent = "ZATRZYMAJ";
-                btn.style.background = "#f87171";
-                statusEl.textContent = ""; // Czyszczenie błędu po udanym starcie
-            }).catch(e => {
-                statusEl.textContent = "Błąd: Przeglądarka blokuje odtwarzanie (np. przez certyfikat SSL dla streamu HTTP).";
-            });
+            audio.play();
+            btn.textContent = "STOP";
+            btn.style.background = "#f87171";
         } else {
             audio.pause();
             btn.textContent = "URUCHOM RADIO";
@@ -68,43 +46,28 @@
         }
     }
 
-    function setVol(v) {
-        audio.volume = v;
-        document.getElementById('volVal').textContent = Math.round(v * 100) + "%";
-    }
-
-    async function refreshData() {
+    async function refresh() {
         try {
-            const r = await fetch('api.php?cb=' + Date.now());
+            // Używamy względnej ścieżki - index i api muszą być w tym samym folderze!
+            const r = await fetch('api.php');
+            if (!r.ok) throw new Error("Plik api.php nie odpowiada");
+            const d = await r.json();
             
-            if (!r.ok) throw new Error(`Błąd serwera (${r.status}).`);
+            document.getElementById('currentTrack').textContent = d.current;
             
-            const data = await r.json();
-            
-            // Jeśli serwer PHP zwrócił nasz własny komunikat o błędzie JSON
-            if (data.error) throw new Error(data.error);
-
-            trackEl.textContent = data.current;
-            statusEl.textContent = "";
-
-            let html = "";
-            if (data.history && data.history.length > 0) {
-                data.history.forEach(item => {
-                    html += `<tr><td class="time">${item.date} ${item.time}</td><td>${item.title}</td></tr>`;
-                });
-            } else {
-                html = "<tr><td colspan='2'>Czekam na nową piosenkę...</td></tr>";
-            }
-            listEl.innerHTML = html;
-
+            let h = "";
+            d.history.forEach(i => {
+                h += `<tr><td class="time">${i.time}</td><td>${i.title}</td></tr>`;
+            });
+            document.getElementById('historyList').innerHTML = h;
+            document.getElementById('status').textContent = "";
         } catch (e) {
-            statusEl.textContent = "Błąd API: " + e.message;
+            document.getElementById('status').textContent = "Błąd API: " + e.message;
         }
     }
 
-    setInterval(refreshData, 10000);
-    refreshData();
+    setInterval(refresh, 10000);
+    refresh();
 </script>
-
 </body>
 </html>
