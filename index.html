@@ -2,126 +2,108 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="referrer" content="no-referrer">
-    <title>HITS FM - Radio Szpieg</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITS FM Szpieg</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f1f5f9; padding: 20px; }
-        .card { max-width: 800px; margin: auto; background: #1e293b; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* Odtwarzacz */
-        .player-ui { text-align: center; border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 20px; }
-        #track-title { font-size: 24px; font-weight: bold; color: #38bdf8; display: block; margin: 15px 0; }
-        
-        .controls { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .play-btn { background: #38bdf8; border: none; padding: 12px 30px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-        
-        /* Głośność */
-        .volume-box { display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 14px; }
-        input[type=range] { cursor: pointer; accent-color: #38bdf8; }
-
-        /* Tabela */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { text-align: left; padding: 12px; color: #94a3b8; font-size: 12px; border-bottom: 2px solid #334155; }
-        td { padding: 12px; border-bottom: 1px solid #334155; font-size: 14px; }
-        .time-col { color: #38bdf8; font-family: monospace; width: 160px; }
-
-        .status-msg { font-size: 11px; color: #475569; margin-top: 10px; text-align: center; }
+        body { background: #0f172a; color: #fff; font-family: sans-serif; display: flex; justify-content: center; padding: 20px; }
+        .card { background: #1e293b; padding: 25px; border-radius: 15px; width: 100%; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .track { font-size: 22px; font-weight: bold; color: #38bdf8; text-align: center; margin: 20px 0; min-height: 30px; }
+        .player-controls { display: flex; flex-direction: column; align-items: center; gap: 15px; padding: 20px; border-bottom: 1px solid #334155; }
+        .play-btn { background: #38bdf8; color: #0f172a; border: none; padding: 12px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .vol-box { display: flex; align-items: center; gap: 10px; color: #94a3b8; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        td, th { padding: 12px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
+        .time { color: #38bdf8; width: 140px; font-family: monospace; }
+        .error { color: #f87171; font-size: 12px; text-align: center; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div class="player-ui">
-        <small style="letter-spacing: 2px; color: #64748b;">HITS FM LIVE</small>
-        <span id="track-title">Inicjalizacja szpiega...</span>
+    <div class="player-controls">
+        <div style="font-size: 12px; color: #94a3b8;">RADIO NA ŻYWO</div>
+        <div class="track" id="currentTrack">Ładowanie...</div>
         
-        <div class="controls">
-            <button class="play-btn" onclick="togglePlay()" id="playBtn">GRAJ</button>
-            
-            <div class="volume-box">
-                <span>Głośność:</span>
-                <input type="range" id="volRange" min="0" max="1" step="0.05" value="0.8" oninput="setVolume(this.value)">
-                <span id="volLabel">80%</span>
-            </div>
+        <button class="play-btn" onclick="toggleAudio()" id="pBtn">URUCHOM RADIO</button>
+        
+        <div class="vol-box">
+            Głośność: 
+            <input type="range" min="0" max="1" step="0.01" value="0.8" oninput="setVol(this.value)">
+            <span id="volVal">80%</span>
         </div>
     </div>
 
-    <h3>Ostatnio grane</h3>
-    <div style="max-height: 400px; overflow-y: auto;">
-        <table>
-            <thead>
-                <tr>
-                    <th>Data i Godzina</th>
-                    <th>Utwór</th>
-                </tr>
-            </thead>
-            <tbody id="history-log"></tbody>
-        </table>
-    </div>
-    
-    <div class="status-msg" id="debug">Status: Oczekiwanie...</div>
+    <table>
+        <thead>
+            <tr><th>Kiedy</th><th>Utwór</th></tr>
+        </thead>
+        <tbody id="historyList"></tbody>
+    </table>
+    <div id="status" class="error"></div>
 </div>
 
-<audio id="radio" src="http://82.145.41.8:33745/stream" crossorigin="anonymous"></audio>
+<audio id="audio" src="http://82.145.41.8:33745/stream"></audio>
 
 <script>
-    const audio = document.getElementById('radio');
-    const playBtn = document.getElementById('playBtn');
-    const trackTitle = document.getElementById('track-title');
-    const historyLog = document.getElementById('history-log');
-    const debug = document.getElementById('debug');
+    const audio = document.getElementById('audio');
+    const trackEl = document.getElementById('currentTrack');
+    const listEl = document.getElementById('historyList');
+    const statusEl = document.getElementById('status');
 
-    // Obsługa głośności
-    function setVolume(val) {
-        audio.volume = val;
-        document.getElementById('volLabel').textContent = Math.round(val * 100) + "%";
-    }
-
-    // Obsługa odtwarzania
-    function togglePlay() {
+    function toggleAudio() {
+        const btn = document.getElementById('pBtn');
         if (audio.paused) {
             audio.load();
-            audio.play();
-            playBtn.textContent = "STOP";
-            playBtn.style.background = "#f43f5e";
+            audio.play().then(() => {
+                btn.textContent = "ZATRZYMAJ";
+                btn.style.background = "#f87171";
+                statusEl.textContent = ""; // Czyszczenie błędu po udanym starcie
+            }).catch(e => {
+                statusEl.textContent = "Błąd: Przeglądarka blokuje odtwarzanie (np. przez certyfikat SSL dla streamu HTTP).";
+            });
         } else {
             audio.pause();
-            playBtn.textContent = "GRAJ";
-            playBtn.style.background = "#38bdf8";
+            btn.textContent = "URUCHOM RADIO";
+            btn.style.background = "#38bdf8";
         }
     }
 
-    // Synchronizacja danych z serwerem
-    async function updateData() {
+    function setVol(v) {
+        audio.volume = v;
+        document.getElementById('volVal').textContent = Math.round(v * 100) + "%";
+    }
+
+    async function refreshData() {
         try {
-            const res = await fetch('api.php?cache_buster=' + Date.now());
-            const data = await res.json();
+            const r = await fetch('api.php?cb=' + Date.now());
+            
+            if (!r.ok) throw new Error(`Błąd serwera (${r.status}).`);
+            
+            const data = await r.json();
+            
+            // Jeśli serwer PHP zwrócił nasz własny komunikat o błędzie JSON
+            if (data.error) throw new Error(data.error);
 
-            trackTitle.textContent = data.current;
-            debug.textContent = "Status: " + data.debug_status;
+            trackEl.textContent = data.current;
+            statusEl.textContent = "";
 
-            // Budowanie tabeli historii
-            let rows = "";
+            let html = "";
             if (data.history && data.history.length > 0) {
                 data.history.forEach(item => {
-                    rows += `<tr>
-                        <td class="time-col">${item.date} ${item.time}</td>
-                        <td>${item.title}</td>
-                    </tr>`;
+                    html += `<tr><td class="time">${item.date} ${item.time}</td><td>${item.title}</td></tr>`;
                 });
             } else {
-                rows = "<tr><td colspan='2'>Brak utworów w bazie (czekam na zmianę piosenki)</td></tr>";
+                html = "<tr><td colspan='2'>Czekam na nową piosenkę...</td></tr>";
             }
-            historyLog.innerHTML = rows;
+            listEl.innerHTML = html;
 
         } catch (e) {
-            debug.textContent = "Błąd: Brak połączenia z plikiem api.php";
+            statusEl.textContent = "Błąd API: " + e.message;
         }
     }
 
-    // Interwał 10 sekund
-    setInterval(updateData, 10000);
-    updateData(); // Pierwszy start
+    setInterval(refreshData, 10000);
+    refreshData();
 </script>
 
 </body>
