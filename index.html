@@ -2,72 +2,282 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>HITS FM - Odsłuchane</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HITS FM - Ostatnio grane</title>
+    
+    <link rel="icon" href="favicon.ico?v=2.0" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico?v=2.0" type="image/x-icon">
+
     <style>
-        body { background: #0f172a; color: #fff; font-family: sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .card { background: #1e293b; padding: 20px; border-radius: 12px; width: 100%; max-width: 500px; }
-        .track { font-size: 20px; color: #38bdf8; text-align: center; margin: 15px 0; font-weight: bold; }
-        .play-btn { width: 100%; padding: 15px; border-radius: 8px; border: none; background: #38bdf8; cursor: pointer; font-weight: bold; }
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 14px; }
-        td { padding: 8px; border-bottom: 1px solid #334155; }
-        .time { color: #38bdf8; width: 80px; }
-        .error { color: #f87171; text-align: center; font-size: 12px; margin-top: 10px; }
+        @font-face {
+            font-family: 'UbuntuCustom';
+            src: url('Ubuntu_Regular.ttf') format('truetype');
+            font-weight: normal; font-style: normal;
+        }
+        @font-face {
+            font-family: 'NotoMonoCustom';
+            src: url('NotoMono-Regular.ttf') format('truetype');
+            font-weight: normal; font-style: normal;
+        }
+
+        :root { 
+            --bg: #0e0e0e; 
+            --panel: #1a1a1a; 
+            --accent: #38bdf8; 
+            --border: #2e2e2e;
+            --text: #ffffff;
+            --subtext: #a0a0a0;
+            --red: #ef4444;
+            --hover-bg: #222222;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'UbuntuCustom', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            padding: 10px; 
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 1000px; 
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .logo-container { width: 100%; text-align: center; margin-bottom: 5px; }
+        .main-logo { max-width: 280px; height: auto; display: inline-block; }
+
+        .box { 
+            background: var(--panel); 
+            border: 1px solid var(--border); 
+            padding: 25px;
+            border-radius: 0px; 
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .header-tag {
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .track-display {
+            font-family: 'UbuntuCustom', sans-serif;
+            font-size: clamp(16px, 4.5vw, 24px); 
+            font-weight: 800;
+            margin-bottom: 30px;
+            line-height: 1.2;
+            min-height: 50px;
+            border-left: 4px solid var(--accent);
+            padding-left: 15px;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-rect {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            font-weight: 900;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            min-width: 150px;
+        }
+
+        .btn-rect:hover { background: #fff; }
+        .btn-rect.active { background: var(--red); color: #fff; }
+
+        .btn-m3u {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 11px 15px;
+            font-weight: 900;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .btn-m3u:hover { background: var(--accent); color: #000; }
+
+        .vol-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-grow: 1;
+            min-width: 180px;
+        }
+
+        input[type=range] { flex-grow:1; accent-color: var(--accent); cursor: pointer; }
+
+        .history-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-top h2 { font-size: 14px; margin: 0; text-transform: uppercase; }
+
+        select {
+            font-family: 'UbuntuCustom', sans-serif;
+            background: #222; 
+            color: var(--accent); 
+            border: 1px solid #444; 
+            padding: 4px 8px; 
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .song-item {
+            display: grid;
+            grid-template-columns: 90px 1fr;
+            padding: 8px 10px;
+            border-bottom: 1px solid #252525;
+            gap: 10px;
+            font-family: 'NotoMonoCustom', monospace;
+            transition: 0.2s;
+            margin: 0 -10px;
+        }
+        .song-item:hover { background-color: var(--hover-bg); color: #ffffff; }
+        .s-time { color: var(--accent); font-size: 12px; }
+        .s-title { color: var(--subtext); font-size: 13px; }
+
+        @media (max-width: 600px) {
+            .btn-rect, .btn-m3u { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div style="text-align:center; font-size: 12px; color: #94a3b8;">TERAZ GRAMY:</div>
-    <div class="track" id="currentTrack">Ładowanie...</div>
-    
-    <button class="play-btn" onclick="toggleAudio()" id="pBtn">URUCHOM RADIO</button>
-    
-    <table>
-        <tbody id="historyList"></tbody>
-    </table>
-    <div id="status" class="error"></div>
+<div class="container">
+    <div class="logo-container">
+        <img src="hitsfm.png" alt="HITS FM Logo" class="main-logo">
+    </div>
+
+    <div class="box">
+        <span class="header-tag">Teraz grane</span>
+        <div class="track-display" id="currentTrack">Inicjalizacja...</div>
+        
+        <div class="controls-row">
+            <button class="btn-rect" onclick="toggleAudio()" id="pBtn">Słuchaj online</button>
+            <button class="btn-m3u" onclick="downloadM3U()">Pobierz M3U</button>
+
+            <div class="vol-group">
+                <span style="font-size: 10px;">VOL</span>
+                <input type="range" min="0" max="1" step="0.01" value="1" oninput="updateVol(this.value)">
+                <span id="vNum" style="font-family: 'NotoMonoCustom', monospace; width: 40px; font-size: 12px;">100%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="box">
+        <div class="history-top">
+            <h2>Ostatnio grane</h2>
+            <select id="datePicker" onchange="renderHistory()"></select>
+        </div>
+        <div id="historyList" style="padding: 0 10px;"></div>
+    </div>
 </div>
 
-<audio id="audio" src="http://82.145.41.8:33745/stream"></audio>
+<audio id="audio"></audio>
 
 <script>
+    // 1. Usuwanie ?i=1, ?i=2 z adresu URL
+    if (window.location.search.includes('i=')) {
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    }
+
     const audio = document.getElementById('audio');
-    
+    const streamUrl = "https://stream.dxpoland.eu/hits_fm";
+    let fullHistory = [];
+
+    // Głośność startowa 100%
+    audio.volume = 1.0;
+
     function toggleAudio() {
         const btn = document.getElementById('pBtn');
-        if (audio.paused) {
-            audio.play();
-            btn.textContent = "STOP";
-            btn.style.background = "#f87171";
+        if (audio.paused || audio.src === "") {
+            audio.src = streamUrl + "?nocache=" + new Date().getTime();
+            audio.load(); audio.play();
+            btn.textContent = "Zatrzymaj"; btn.classList.add('active');
         } else {
-            audio.pause();
-            btn.textContent = "URUCHOM RADIO";
-            btn.style.background = "#38bdf8";
+            audio.pause(); audio.src = "";
+            btn.textContent = "Słuchaj online"; btn.classList.remove('active');
         }
     }
 
-    async function refresh() {
+    function updateVol(v) {
+        audio.volume = v;
+        document.getElementById('vNum').textContent = Math.round(v * 100) + "%";
+    }
+
+    function downloadM3U() {
+        const m3uContent = "#EXTM3U\n#EXTINF:-1,HITS FM\n" + streamUrl;
+        const blob = new Blob([m3uContent], { type: 'audio/x-mpegurl' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'hits_fm.m3u';
+        document.body.appendChild(a); a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    async function fetchData() {
         try {
-            // Używamy względnej ścieżki - index i api muszą być w tym samym folderze!
-            const r = await fetch('api.php');
-            if (!r.ok) throw new Error("Plik api.php nie odpowiada");
+            const r = await fetch('api.php?t=' + Date.now());
             const d = await r.json();
-            
             document.getElementById('currentTrack').textContent = d.current;
-            
-            let h = "";
-            d.history.forEach(i => {
-                h += `<tr><td class="time">${i.time}</td><td>${i.title}</td></tr>`;
-            });
-            document.getElementById('historyList').innerHTML = h;
-            document.getElementById('status').textContent = "";
-        } catch (e) {
-            document.getElementById('status').textContent = "Błąd API: " + e.message;
-        }
+            fullHistory = d.history || [];
+            const picker = document.getElementById('datePicker');
+            const currentVal = picker.value;
+            if (d.available_dates && picker.options.length !== d.available_dates.length) {
+                picker.innerHTML = d.available_dates.map(date => 
+                    `<option value="${date}">${date.split('-').reverse().join('.')}</option>`
+                ).join('');
+                if (!currentVal && d.available_dates.length > 0) picker.value = d.available_dates[0];
+                else if (currentVal) picker.value = currentVal;
+            }
+            renderHistory();
+        } catch (e) { console.error("Błąd danych"); }
     }
 
-    setInterval(refresh, 10000);
-    refresh();
+    function renderHistory() {
+        const selectedDate = document.getElementById('datePicker').value;
+        const list = document.getElementById('historyList');
+        if (!selectedDate) return;
+        const filtered = fullHistory.filter(item => item.date === selectedDate);
+        list.innerHTML = filtered.map(i => `
+            <div class="song-item">
+                <div class="s-time">${i.time}</div>
+                <div class="s-title">${i.title}</div>
+            </div>
+        `).join('');
+    }
+
+    setInterval(fetchData, 10000);
+    fetchData();
 </script>
 </body>
 </html>
