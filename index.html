@@ -3,281 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HITS FM - Ostatnio grane</title>
-    
-    <link rel="icon" href="favicon.ico?v=2.0" type="image/x-icon">
-    <link rel="shortcut icon" href="favicon.ico?v=2.0" type="image/x-icon">
-
+    <title>Kalkulator Dipola FM - Dark Mode</title>
     <style>
         @font-face {
-            font-family: 'UbuntuCustom';
+            font-family: 'Ubuntu';
             src: url('Ubuntu_Regular.ttf') format('truetype');
-            font-weight: normal; font-style: normal;
+            font-weight: normal;
+            font-style: normal;
         }
+
         @font-face {
-            font-family: 'NotoMonoCustom';
+            font-family: 'Noto Mono';
             src: url('NotoMono-Regular.ttf') format('truetype');
-            font-weight: normal; font-style: normal;
+            font-weight: normal;
+            font-style: normal;
         }
 
-        :root { 
-            --bg: #0e0e0e; 
-            --panel: #1a1a1a; 
-            --accent: #38bdf8; 
-            --border: #2e2e2e;
-            --text: #ffffff;
-            --subtext: #a0a0a0;
-            --red: #ef4444;
-            --hover-bg: #222222;
-        }
-
-        body { 
-            background: var(--bg); 
-            color: var(--text); 
-            font-family: 'UbuntuCustom', sans-serif; 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            padding: 10px; 
-        }
-
-        .container { 
-            width: 100%; 
-            max-width: 1000px; 
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .logo-container { width: 100%; text-align: center; margin-bottom: 5px; }
-        .main-logo { max-width: 280px; height: auto; display: inline-block; }
-
-        .box { 
-            background: var(--panel); 
-            border: 1px solid var(--border); 
-            padding: 25px;
-            border-radius: 0px; 
-            width: 100%;
+        * {
             box-sizing: border-box;
         }
 
-        .header-tag {
-            font-size: 9px;
-            font-weight: 900;
-            text-transform: uppercase;
-            color: var(--accent);
-            letter-spacing: 3px;
-            margin-bottom: 8px;
-            display: block;
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-dim: #b0b0b0;
+            --accent-blue: #3498db;
+            --accent-orange: #f39c12;
+            --accent-purple: #9b59b6;
+            --input-bg: #333;
         }
 
-        .track-display {
-            font-family: 'UbuntuCustom', sans-serif;
-            font-size: clamp(16px, 4.5vw, 24px); 
-            font-weight: 800;
+        body {
+            font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            max-width: 550px;
+            width: 100%;
+            border: 1px solid #333;
+        }
+
+        h1 {
+            text-align: center;
             margin-bottom: 30px;
-            line-height: 1.2;
-            min-height: 50px;
-            border-left: 4px solid var(--accent);
+            font-weight: normal;
+            letter-spacing: 1px;
+            color: #fff;
+        }
+
+        .control-panel {
+            background: #252525;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child { margin-bottom: 0; }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        label span {
+            color: var(--accent-blue);
+            font-weight: bold;
+            font-family: 'Noto Mono', monospace;
+            font-size: 1.1rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: var(--input-bg);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .result-box {
+            background: #2a2a2a;
+            padding: 15px 5px;
+            border-radius: 10px;
+            text-align: center;
+            border-top: 2px solid var(--accent-blue);
+        }
+
+        .result-box.gap-box { border-top-color: var(--accent-orange); }
+        .result-box.imp-box { border-top-color: var(--accent-purple); }
+
+        .result-box span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 5px;
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        .result-box strong {
+            font-size: 1.1rem;
+            color: #fff;
+            font-family: 'Noto Mono', monospace;
+        }
+
+        .visual-container {
+            background: #181818;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #252525;
+        }
+
+        .legend {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            line-height: 1.5;
+            border-left: 3px solid #444;
             padding-left: 15px;
         }
 
-        .controls-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+        .legend strong { color: var(--accent-blue); }
 
-        .btn-rect {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            font-weight: 900;
-            font-size: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-            min-width: 150px;
-        }
-
-        .btn-rect:hover { background: #fff; }
-        .btn-rect.active { background: var(--red); color: #fff; }
-
-        .btn-m3u {
-            background: transparent;
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 11px 15px;
-            font-weight: 900;
-            font-size: 11px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.2s;
-        }
-        .btn-m3u:hover { background: var(--accent); color: #000; }
-
-        .vol-group {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-grow: 1;
-            min-width: 180px;
-        }
-
-        input[type=range] { flex-grow:1; accent-color: var(--accent); cursor: pointer; }
-
-        .history-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .history-top h2 { font-size: 14px; margin: 0; text-transform: uppercase; }
-
-        select {
-            font-family: 'UbuntuCustom', sans-serif;
-            background: #222; 
-            color: var(--accent); 
-            border: 1px solid #444; 
-            padding: 4px 8px; 
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .song-item {
-            display: grid;
-            grid-template-columns: 90px 1fr;
-            padding: 8px 10px;
-            border-bottom: 1px solid #252525;
-            gap: 10px;
-            font-family: 'NotoMonoCustom', monospace;
-            transition: 0.2s;
-            margin: 0 -10px;
-        }
-        .song-item:hover { background-color: var(--hover-bg); color: #ffffff; }
-        .s-time { color: var(--accent); font-size: 12px; }
-        .s-title { color: var(--subtext); font-size: 13px; }
-
-        @media (max-width: 600px) {
-            .btn-rect, .btn-m3u { width: 100%; }
+        /* Media queries dla responsywności na małych ekranach */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            .results {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            body {
+                padding: 10px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="logo-container">
-        <img src="hitsfm.png" alt="HITS FM Logo" class="main-logo">
-    </div>
-
-    <div class="box">
-        <span class="header-tag">Teraz grane</span>
-        <div class="track-display" id="currentTrack">Inicjalizacja...</div>
-        
-        <div class="controls-row">
-            <button class="btn-rect" onclick="toggleAudio()" id="pBtn">Słuchaj online</button>
-            <button class="btn-m3u" onclick="downloadM3U()">Pobierz M3U</button>
-
-            <div class="vol-group">
-                <span style="font-size: 10px;">VOL</span>
-                <input type="range" min="0" max="1" step="0.01" value="1" oninput="updateVol(this.value)">
-                <span id="vNum" style="font-family: 'NotoMonoCustom', monospace; width: 40px; font-size: 12px;">100%</span>
-            </div>
+    <h1>Kalkulator Anteny FM</h1>
+    
+    <div class="control-panel">
+        <div class="input-group">
+            <label>Częstotliwość: <span><span id="freq-val">96.0</span> MHz</span></label>
+            <input type="range" id="freq" min="87.5" max="108" step="0.1" value="96.0">
+        </div>
+        <div class="input-group">
+            <label>Przerwa (G): <span><span id="gap-val">2.0</span> cm</span></label>
+            <input type="range" id="gap" min="0.5" max="5" step="0.1" value="2.0">
         </div>
     </div>
 
-    <div class="box">
-        <div class="history-top">
-            <h2>Ostatnio grane</h2>
-            <select id="datePicker" onchange="renderHistory()"></select>
+    <div class="results">
+        <div class="result-box">
+            <span>Długość (L)</span>
+            <strong id="total-len">-</strong>
         </div>
-        <div id="historyList" style="padding: 0 10px;"></div>
+        <div class="result-box gap-box">
+            <span>Przerwa (G)</span>
+            <strong id="res-gap">-</strong>
+        </div>
+        <div class="result-box">
+            <span>Ramię (A)</span>
+            <strong id="arm-len">-</strong>
+        </div>
+        <div class="result-box imp-box">
+            <span>Impedancja (Z)</span>
+            <strong id="impedance">-</strong>
+        </div>
+    </div>
+
+    <div class="visual-container">
+        <svg viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg">
+            <line x1="40" y1="90" x2="192" y2="90" stroke="#ecf0f1" stroke-width="8" stroke-linecap="round" />
+            <line x1="208" y1="90" x2="360" y2="90" stroke="#ecf0f1" stroke-width="8" stroke-linecap="round" />
+            
+            <path d="M192 90 Q192 140 170 160" fill="none" stroke="#555" stroke-width="3" />
+            <path d="M208 90 Q208 140 230 160" fill="none" stroke="#555" stroke-width="3" stroke-dasharray="4" />
+            
+            <text x="115" y="75" font-family="'Noto Mono', monospace" font-size="11" fill="#bbb" text-anchor="middle" id="svg-arm-1">A</text>
+            <text x="285" y="75" font-family="'Noto Mono', monospace" font-size="11" fill="#bbb" text-anchor="middle" id="svg-arm-2">A</text>
+            
+            <line x1="192" y1="105" x2="208" y2="105" stroke="var(--accent-orange)" stroke-width="2" />
+            <text x="200" y="122" font-family="'Noto Mono', monospace" font-size="11" font-weight="bold" fill="var(--accent-orange)" text-anchor="middle" id="svg-gap">G</text>
+            
+            <line x1="40" y1="45" x2="360" y2="45" stroke="var(--accent-blue)" stroke-width="1" />
+            <text x="200" y="35" font-family="'Noto Mono', monospace" font-size="12" font-weight="bold" fill="var(--accent-blue)" text-anchor="middle" id="svg-total">L</text>
+        </svg>
+    </div>
+
+    <div class="legend">
+        <strong>Montaż:</strong> Rozsuń oba teleskopy na długość <strong>A</strong>. Zachowaj przerwę <strong>G</strong> pomiędzy ich podstawami. Całkowita rozpiętość anteny wyniesie <strong>L</strong>.
     </div>
 </div>
 
-<audio id="audio"></audio>
-
 <script>
-    // 1. Usuwanie ?i=1, ?i=2 z adresu URL
-    if (window.location.search.includes('i=')) {
-        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    const freqIn = document.getElementById('freq');
+    const gapIn = document.getElementById('gap');
+    
+    function update() {
+        const f = parseFloat(freqIn.value);
+        const g = parseFloat(gapIn.value);
+        
+        document.getElementById('freq-val').textContent = f.toFixed(1);
+        document.getElementById('gap-val').textContent = g.toFixed(1);
+        
+        // Współczynnik skrócenia k=0.95: 142.5 / f
+        const totalCm = (142.5 / f) * 100;
+        const armCm = (totalCm - g) / 2;
+
+        document.getElementById('total-len').textContent = totalCm.toFixed(1) + " cm";
+        document.getElementById('res-gap').textContent = g.toFixed(1) + " cm";
+        document.getElementById('arm-len').textContent = armCm.toFixed(1) + " cm";
+        
+        // Rezonansowy dipol w wolnej przestrzeni ma stałą impedancję ok. 73 Ohm
+        document.getElementById('impedance').textContent = "~73 Ω";
+        
+        document.getElementById('svg-arm-1').textContent = armCm.toFixed(1) + " cm";
+        document.getElementById('svg-arm-2').textContent = armCm.toFixed(1) + " cm";
+        document.getElementById('svg-gap').textContent = g.toFixed(1) + " cm";
+        document.getElementById('svg-total').textContent = "L = " + totalCm.toFixed(1) + " cm";
     }
 
-    const audio = document.getElementById('audio');
-    const streamUrl = "https://stream.dxpoland.eu/hits_fm";
-    let fullHistory = [];
-
-    // Głośność startowa 100%
-    audio.volume = 1.0;
-
-    function toggleAudio() {
-        const btn = document.getElementById('pBtn');
-        if (audio.paused || audio.src === "") {
-            audio.src = streamUrl + "?nocache=" + new Date().getTime();
-            audio.load(); audio.play();
-            btn.textContent = "Zatrzymaj"; btn.classList.add('active');
-        } else {
-            audio.pause(); audio.src = "";
-            btn.textContent = "Słuchaj online"; btn.classList.remove('active');
-        }
-    }
-
-    function updateVol(v) {
-        audio.volume = v;
-        document.getElementById('vNum').textContent = Math.round(v * 100) + "%";
-    }
-
-    function downloadM3U() {
-        const m3uContent = "#EXTM3U\n#EXTINF:-1,HITS FM\n" + streamUrl;
-        const blob = new Blob([m3uContent], { type: 'audio/x-mpegurl' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'hits_fm.m3u';
-        document.body.appendChild(a); a.click();
-        window.URL.revokeObjectURL(url);
-    }
-
-    async function fetchData() {
-        try {
-            const r = await fetch('api.php?t=' + Date.now());
-            const d = await r.json();
-            document.getElementById('currentTrack').textContent = d.current;
-            fullHistory = d.history || [];
-            const picker = document.getElementById('datePicker');
-            const currentVal = picker.value;
-            if (d.available_dates && picker.options.length !== d.available_dates.length) {
-                picker.innerHTML = d.available_dates.map(date => 
-                    `<option value="${date}">${date.split('-').reverse().join('.')}</option>`
-                ).join('');
-                if (!currentVal && d.available_dates.length > 0) picker.value = d.available_dates[0];
-                else if (currentVal) picker.value = currentVal;
-            }
-            renderHistory();
-        } catch (e) { console.error("Błąd danych"); }
-    }
-
-    function renderHistory() {
-        const selectedDate = document.getElementById('datePicker').value;
-        const list = document.getElementById('historyList');
-        if (!selectedDate) return;
-        const filtered = fullHistory.filter(item => item.date === selectedDate);
-        list.innerHTML = filtered.map(i => `
-            <div class="song-item">
-                <div class="s-time">${i.time}</div>
-                <div class="s-title">${i.title}</div>
-            </div>
-        `).join('');
-    }
-
-    setInterval(fetchData, 10000);
-    fetchData();
+    freqIn.addEventListener('input', update);
+    gapIn.addEventListener('input', update);
+    update();
 </script>
+
 </body>
 </html>
